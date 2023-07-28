@@ -267,23 +267,32 @@
       "values": [
         {
           "type": "synonyms",
-          "value": "basico",
+          "value": "básico",
           "synonyms": [
-            "1"
+            "1",
+            "basico",
+            "primeira",
+            "primeiro"
           ]
         },
         {
           "type": "synonyms",
-          "value": "padrao",
+          "value": "padrão",
           "synonyms": [
-            "2"
+            "2",
+            "padrao",
+            "segunda",
+            "segundo"
           ]
         },
         {
           "type": "synonyms",
           "value": "premium",
           "synonyms": [
-            "3"
+            "3",
+            "premium",
+            "terceira",
+            "terceiro"
           ]
         }
       ],
@@ -332,7 +341,12 @@
     {
       "url": "https://us-east.functions.appdomain.cloud/api/v1/web/c5ca77e4-8bb2-4f42-9913-b0561ae49736/default/MVP-Bot-Watson.json",
       "name": "main_webhook",
-      "headers": []
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
     }
   ],
   "dialog_nodes": [
@@ -417,7 +431,8 @@
       "parent": "node_6_1682890604212",
       "disabled": true,
       "event_name": "focus",
-      "dialog_node": "handler_1_1690309825422"
+      "dialog_node": "handler_1_1690309825422",
+      "previous_sibling": "response_1_1690562531507"
     },
     {
       "type": "event_handler",
@@ -473,7 +488,8 @@
       "output": {},
       "parent": "slot_2_1682898743530",
       "context": {
-        "plano_id": "@planos_id"
+        "plano_id": "@planos_id",
+        "plano_name": "@planos"
       },
       "conditions": "@planos_id",
       "event_name": "input",
@@ -537,17 +553,6 @@
     },
     {
       "type": "event_handler",
-      "output": {},
-      "parent": "slot_5_1690311276227",
-      "context": {
-        "plano_nome": "@planos"
-      },
-      "conditions": "@planos",
-      "event_name": "input",
-      "dialog_node": "handler_6_1690311276229"
-    },
-    {
-      "type": "event_handler",
       "parent": "slot_4_1682892558162",
       "event_name": "input",
       "dialog_node": "handler_7_1682892558176"
@@ -573,25 +578,6 @@
       "conditions": "@name.literal",
       "event_name": "input",
       "dialog_node": "handler_8_1682927353405"
-    },
-    {
-      "type": "event_handler",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": ""
-              }
-            ],
-            "response_type": "text"
-          }
-        ]
-      },
-      "parent": "slot_5_1690311276227",
-      "event_name": "focus",
-      "dialog_node": "handler_8_1690311276229",
-      "previous_sibling": "handler_6_1690311276229"
     },
     {
       "type": "event_handler",
@@ -656,7 +642,7 @@
       "parent": "node_6_1682890604212",
       "conditions": "@sys-number:1 || #Afirmacao && intent[0].confidence > 0.75",
       "dialog_node": "node_10_1682891093711",
-      "previous_sibling": "response_5_1682898920863"
+      "previous_sibling": "slot_2_1682898743530"
     },
     {
       "type": "standard",
@@ -870,7 +856,16 @@
           "type": "webhook",
           "parameters": {
             "action": "order",
-            "payload": "{\"name\":\"$nome,\"cpf\":\"$cpf\",\"zip_code\":\"$endereco_response.cep\",\"city\":\"$endereco_response.localidade\",\"state\":\"$endereco_response.uf\",\"neighborhood\":\"$endereco_response.bairro\",\"plan_id\":\"$plano_id\",\"plan_name\":\"$plano_nome\"}"
+            "payload": {
+              "cpf": "$cpf",
+              "city": "$endereco_response.localidade",
+              "name": "$nome",
+              "state": "$endereco_response.uf",
+              "plan_id": "$plano_id",
+              "zip_code": "$endereco_response.cep",
+              "plan_name": "$plano_name",
+              "neighborhood": "$endereco_response.bairro"
+            }
           },
           "result_variable": "pedido_response"
         }
@@ -974,7 +969,7 @@
           "mcr": true
         }
       },
-      "conditions": "@sys-number:1 || @sys-number:2 || @sys-number:3 || @planos_id",
+      "conditions": "@planos_id",
       "dialog_node": "node_6_1682890604212"
     },
     {
@@ -1268,6 +1263,26 @@
           {
             "values": [
               {
+                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[2].name ?>. \n\n<? $planos_response.plans[2].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[2].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_6_1682890604212",
+      "conditions": "@planos_id:3",
+      "dialog_node": "response_1_1690562531507",
+      "previous_sibling": "response_5_1690562504573"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
                 "text": "Fail"
               }
             ],
@@ -1280,46 +1295,6 @@
       "conditions": "anything_else",
       "dialog_node": "response_2_1682921184511",
       "previous_sibling": "response_8_1682921183211"
-    },
-    {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[0].name ?>. \n\n<? $planos_response.plans[0].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[0].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
-      },
-      "parent": "node_6_1682890604212",
-      "conditions": "@sys-number:1",
-      "dialog_node": "response_4_1682897994382",
-      "previous_sibling": "slot_5_1690311276227"
-    },
-    {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[2].name ?>. \n\n<? $planos_response.plans[2].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[2].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
-      },
-      "parent": "node_6_1682890604212",
-      "conditions": "@sys-number:3",
-      "dialog_node": "response_4_1682898886467",
-      "previous_sibling": "response_7_1682898858121"
     },
     {
       "type": "response_condition",
@@ -1346,7 +1321,7 @@
           {
             "values": [
               {
-                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[1].name ?>. \n\n<? $planos_response.plans[1].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[1].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
+                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[0].name ?>. \n\n<? $planos_response.plans[0].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[0].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
               }
             ],
             "response_type": "text",
@@ -1355,29 +1330,8 @@
         ]
       },
       "parent": "node_6_1682890604212",
-      "conditions": "@sys-number:2",
-      "dialog_node": "response_5_1682898446619",
-      "previous_sibling": "response_9_1682898052402"
-    },
-    {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[2].name ?>. \n\n<? $planos_response.plans[2].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[2].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
-      },
-      "parent": "node_6_1682890604212",
-      "conditions": "@planos:premium",
-      "dialog_node": "response_5_1682898920863",
-      "previous_sibling": "response_4_1682898886467"
+      "conditions": "@planos_id:1",
+      "dialog_node": "response_4_1690562083624"
     },
     {
       "type": "response_condition",
@@ -1414,9 +1368,9 @@
         ]
       },
       "parent": "node_6_1682890604212",
-      "conditions": "@planos:padrao",
-      "dialog_node": "response_7_1682898858121",
-      "previous_sibling": "response_5_1682898446619"
+      "conditions": "@planos_id:2",
+      "dialog_node": "response_5_1690562504573",
+      "previous_sibling": "response_4_1690562083624"
     },
     {
       "type": "response_condition",
@@ -1439,30 +1393,11 @@
       "previous_sibling": "slot_6_1682921183942"
     },
     {
-      "type": "response_condition",
-      "output": {
-        "generic": [
-          {
-            "values": [
-              {
-                "text": "Confirme seu pedido:\n\n🌐 Plano por assinatura <? $planos_response.plans[0].name ?>. \n\n<? $planos_response.plans[0].description ?> \n\nTOTAL\n\nValor PROMOCIONAL: R$ <? $planos_response.plans[0].price ?>,00\n\nTaxa de adesão: GRÁTIS  \n\n----------------------------\n1 - Quero esse plano 👍  \n2 - Escolher outro plano 👈"
-              }
-            ],
-            "response_type": "text",
-            "selection_policy": "sequential"
-          }
-        ]
-      },
-      "parent": "node_6_1682890604212",
-      "conditions": "@planos:basico",
-      "dialog_node": "response_9_1682898052402",
-      "previous_sibling": "response_4_1682897994382"
-    },
-    {
       "type": "slot",
       "output": {},
       "parent": "node_6_1682890604212",
       "variable": "$plano_id",
+      "conditions": "true",
       "dialog_node": "slot_2_1682898743530",
       "previous_sibling": "handler_1_1690309825422"
     },
@@ -1482,15 +1417,6 @@
       "parent": "node_9_1682915358108",
       "variable": "$data_aniversario",
       "dialog_node": "slot_4_1682927377311"
-    },
-    {
-      "type": "slot",
-      "output": {},
-      "parent": "node_6_1682890604212",
-      "variable": "$plano_nome",
-      "conditions": "@planos",
-      "dialog_node": "slot_5_1690311276227",
-      "previous_sibling": "slot_2_1682898743530"
     },
     {
       "type": "slot",
@@ -1519,7 +1445,11 @@
       "dialog_node": "slot_8_1682925050612"
     }
   ],
-  "counterexamples": [],
+  "counterexamples": [
+    {
+      "text": "1"
+    }
+  ],
   "system_settings": {
     "disambiguation": {
       "prompt": "Você quis dizer:",

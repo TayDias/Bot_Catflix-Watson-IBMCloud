@@ -33,8 +33,9 @@ function main({action, doc, zipCode, payload}) {
 	else if (action == "order") {
 	    
 	    if (payload == null) {
-	        return { status: "Failed", message: "Função em desenvolvimento" }
+	        return { status: "Failed", message: "Request sem o parâmetro payload" }
 	    }
+	    
 	    
 	    return sendEmail(payload)
 	    
@@ -141,8 +142,8 @@ async function validateZipCode(cep) {
 // Enviar e-mail para a proposta
 function sendEmail(payload) {
     const mailer = require('nodemailer')
-    
-    // payload = name, cpf, zip_code, city, state, neighborhood, plan_id, plan_name
+
+    // payload = nome, cpf, zip_code, city, state, neighborhood, plan_id, plan_name
     
     const order = payload
     const planList = getPlans()
@@ -154,17 +155,19 @@ function sendEmail(payload) {
     let text = "O cliente " + order.name + " (CPF: " + order.cpf + ") solicitou a contratação do plano " + plan_name + "."
     text = text + " Local de cobrança no endereço " + order.neighborhood + ", " + order.city + ", " + order.state + " - CEP " + order.zip_code + "."
     
+    // Check the credentials in "Email Testing" -> "Inboxes" -> "SMTP Settings" -> "Show Credentials"
     let transporter = mailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.mailtrap.io',
+      port: 2525,
       auth: {
-        user: 'testedev@gmail.com',
-        pass: '123456'
+        user: '************',
+        pass: '************'
       }
     })
     
     let mailOptions = {
-      from: 'testedev@gmail.com',
-      to: 'testedev@gmail.com',
+      from: '********67@gmail.com',
+      to: '********67@gmail.com',
       subject: subject,
       text: text
     }
