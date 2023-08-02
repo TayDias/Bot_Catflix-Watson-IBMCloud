@@ -2,12 +2,17 @@
 
 <p>Backup do código de operação. A estrutura é voltada para a captação de leads para planos de uma ferramenta de streaming.</p>
 
+<p>O chatbot informa as opções de planos disponíveis para a contratação e, na escolha de algum pelo cliente, solicita e valida dados pessoais para criar o registro de uma proposta, que é enviada para um e-mail específico.</p>
+
+<p>A estrutura é composta por um fluxo de diálogo e uma lista de entidades e intenções desenvolvidas no IBM Watson Assistant, em interação com uma cloud function criada no IBM Cloud, usando Node.js.</p>
+
 
 # Índice:
 
 * [Status do projeto](#status-do-projeto)
-* [Tecnologias](#Tecnologias)
 * [Funcionalidades](#Funcionalidades)
+* [Tecnologias](#Tecnologias)
+* [Endpoints](#Endpoints)
 * [Configuração do ambiente de teste](#configuração-do-ambiente-de-teste)
 * [Referências](#Arquitetura)
 
@@ -16,13 +21,6 @@
 
 :page_with_curl: Concluído - Em documentação :page_with_curl:
 
-
-# Tecnologias
-
-* [WatsonAssistant](https://www.ibm.com/br-pt/watson)
-* [IBMCloud](https://www.ibm.com/br-pt/cloud/free)
-
-
 # Funcionalidades
 
 * Boas vindas
@@ -30,6 +28,56 @@
 * Validação de CPF
 * Validação de CEP
 * Envio de e-mail com proposta
+
+
+# Tecnologias
+
+* [WatsonAssistant](https://www.ibm.com/br-pt/watson)
+* [IBMCloud](https://www.ibm.com/br-pt/cloud/free)
+
+
+# Endpoints
+
+<table>
+  <thead>
+    <th>Endpoint</th>
+    <th>Método</th>
+    <th>Conteúdo</th>
+    <th>Tipo</th>
+    <th>Finalidade</th>
+  </thead>
+  <body>
+    <tr>
+      <td>/</td>
+      <td>Get</td>
+      <td>{ "action" = type: String, value:"plans" }</td>
+      <td>Corpo (JSON)</td>
+      <td>Listagem de planos disponíveis.</td>
+    </tr>
+    <tr>
+      <td>/</td>
+      <td>Get</td>
+      <td>{ "action" = type:String, value:"validateDoc"; "doc" = type:String }</td>
+      <td>Corpo (JSON)</td>
+      <td>Validação de formato de documentos CPF e CNPJ.</td>
+    </tr>
+    <tr>
+      <td>/</td>
+      <td>Get</td>
+      <td>{ "action" = type:String, value:"validateZC"; "zipCode" = type:String }</td>
+      <td>Corpo (JSON)</td>
+      <td>Validação e consulta de dados do IBGE para CEP.</td>
+    </tr>
+    <tr>
+      <td>/</td>
+      <td>Get</td>
+      <td>{ "action" = type:String, value:"order"; "payload" = type:JSON, value:{ "city" = type:String, "cpf" = type:String, "name" = type:String, "neighborhood" = type:String, "plan_id" = type:Integer, "plan_name" = type:String, "state" = type:String, "zip_code" = type:String }}
+      </td>
+      <td>Corpo (JSON)</td>
+      <td>Criação de texto com a proposta e envio por e-mail.</td>
+    </tr>
+  </body>
+</table>
 
 
 # Configuração do ambiente de teste
